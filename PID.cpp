@@ -12,8 +12,10 @@
 }
 
 
-float PID::PID_iteration(float errors[]){
+float PID::PID_iteration(float SP, float actualValue){
 
+  errors[2] = SP - actualValue;
+  
   e_proportional =  errors[2];
 
   if (_SW){
@@ -41,6 +43,9 @@ float PID::PID_iteration(float errors[]){
     _SW = true;
 
   } 
+
+  errors[1] =  errors[2];
+  errors[0] =  errors[1];
 
   return u ;
 

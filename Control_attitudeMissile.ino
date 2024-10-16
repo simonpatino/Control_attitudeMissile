@@ -9,18 +9,16 @@ float Kd = 1; // PID constant
 int saturation_upper = 90;  //Saturarion of the action signal
 int saturation_lower = -90; //Saturarion of the action signal
 
-int SP_pitch = 10; // Setpoint (grades)
-int SP_yaw = 10; // Setpoint (grades)
+int SP_pitch = 0; // Setpoint (grades)
+int SP_yaw = 0; // Setpoint (grades)
 
-float pitchAngles; // (grades)
-float yawAngles;   // (grades)
+float u_pitch;  //control action
+float u_yaw;  //control action
 
-float _errorsPitch[3] = {0, 0, 0}; // index[0] = f_-2 , index[1] = f_-1 , index[3] = f_0
-                                   // Where f is the function value at time (x)
+float pitchAngle; // Actual pitch (grades)
+float yawAngle;   // Actual Yaw (grades)
 
-float _errorsYaw[3] = {0, 0, 0};   //  ndex[0] = f_-2 , index[1] = f_-1 , index[3] = f_0
-                                   // Where f is the function value at time (x)
-
+ 
 PID pitchController(h , Kp, Ki, Kd, saturation_upper, saturation_lower);
 PID yawController(h , Kp, Ki, Kd, saturation_upper, saturation_lower);
 
@@ -29,22 +27,17 @@ void setup(){
 
 }
 
-
 void loop(){
 
-  _errorsPitch[2] = SP_pitch - pitchAngles;
-  _errorsYaw[2] = SP_yaw - yawAngles;
+  //read pitch
+  //read yaw
 
-  pitchController.PID_iteration(_errorsPitch);
-  yawController.PID_iteration(_errorsYaw);
+  u_pitch = pitchController.PID_iteration( SP_pitch, pitchAngle);
+  u_yaw = yawController.PID_iteration( SP_yaw, yawAngle);
 
-  // Servo move Pitch
-  // Servo move Yaw
+  // Servo move Pitch : insert u_pitch
+  // Servo move Yaw : insert u_yaw
 
-  _errorsPitch[1] =  _errorsPitch[2];
-  _errorsYaw[1] =  _errorsYaw[2];
-
-  _errorsPitch[0] =  _errorsPitch[1];
-  _errorsYaw[0] =  _errorsYaw[1]; 
+  delay(h);
 
 }

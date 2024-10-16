@@ -11,7 +11,7 @@ public:
 
     PID(float h, float Kp, float Ki, float Kd, float saturation_upper, float saturation_lower);  // Constructor declaration
 
-    float PID_iteration(float errors[]);  // Method declaration
+    float PID_iteration(float SP, float actualValue);  // Method declaration
 
 private:
 
@@ -21,6 +21,9 @@ private:
     float e_proportional, e_integrative, e_derivative; 
     float u; //control action
     bool _SW;
+    float errors[3] =  {0, 0, 0}; //inital condition of errors array 
+                                   // index[0] = f_-2 , index[1] = f_-1 , index[2] = f_0
+                                   // Where f is the function value at time (x)
 
 };
 
