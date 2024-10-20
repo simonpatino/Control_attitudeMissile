@@ -3,23 +3,17 @@
 
 #include <ESP32Servo.h>  // Include the ESP32Servo library
 
-
 class servoTransfer {
-
   public:
-
-    Servo myServo;
-
+    // Constructor
     servoTransfer(int myServoPin);
 
+    // Method to move the servo
     void move(float angle);
 
   private:
-
-  float _angle;
-
-
+    Servo myServo;    // Servo object
+    float _angle;     // Stores the current angle
 };
 
-
-#endif 
+#endif  // SERVOTRANSFER_H

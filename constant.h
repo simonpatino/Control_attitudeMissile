@@ -1,7 +1,6 @@
 #include "PID.h" 
 #include "servoTransfer.h"
 
-
 float h = 0.1; //Delta time between measurements 
 
 float Kp = 1; // PID constant 

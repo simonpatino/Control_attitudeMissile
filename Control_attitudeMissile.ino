@@ -1,31 +1,34 @@
 #include "constant.h"
- 
-PID pitchController(h , Kp, Ki, Kd, saturation_upper, saturation_lower);
-PID yawController(h , Kp, Ki, Kd, saturation_upper, saturation_lower);
 
-servoTransfer pitchControler(pitchServoPin);
-servoTransfer yawControler(yawServoPin);
+// PID controllers for pitch and yaw
+PID pitchController(h, Kp, Ki, Kd, saturation_upper, saturation_lower);
+PID yawController(h, Kp, Ki, Kd, saturation_upper, saturation_lower);
 
-void setup(){
+// Servo controls for TVC (Thrust Vector Control)
+servoTransfer pitchServoControl(pitchServoPin);
+servoTransfer yawServoControl(yawServoPin);
 
-  pitchControler.move(0); //initiall position of the TVC
-  yawControler.move(0);   //initiall position of the TVC
+void setup() {
+  // Set initial position of servos to neutral (0 degrees)
+  pitchServoControl.move(0);  
+  yawServoControl.move(0);
 
-  delay(5000);            //Configutation time
-
+  delay(5000);  // Time for configuration/stabilization
 }
 
-void loop(){
+void loop() {
+  // Read the current pitch and yaw angles (replace with actual sensor reading logic)
+  // float pitchAngle = ... ;
+  // float yawAngle = ... ;
 
-  // Y : read pitch
-  // Y : read yaw
+  // Calculate control signal for pitch and yaw using PID controllers
+  float u_pitch = pitchController.PID_iteration(SP_pitch, pitchAngle);  // SP - Y(t) for pitch
+  float u_yaw = yawController.PID_iteration(SP_yaw, yawAngle);          // SP - Y(t) for yaw
 
-  u_pitch = pitchController.PID_iteration( SP_pitch, pitchAngle);  // SP - Y(t)
-  u_yaw = yawController.PID_iteration( SP_yaw, yawAngle);  // SP - Y(t)
+  // Move servos based on PID outputs
+  pitchServoControl.move(u_pitch);  // Move pitch servo
+  yawServoControl.move(u_yaw);      // Move yaw servo
 
-  pitchControler.move(u_pitch);   // Servo move Pitch : insert u_pitch
-  yawControler.move(u_yaw); // Servo move Yaw : insert u_yaw
-
-  //delay(h);
-
+  // Optional: Add a small delay if needed (remove or adjust accordingly)
+  // delay(h);
 }
