@@ -11,7 +11,6 @@
     _SW = true;
 }
 
-
 float PID::PID_iteration(float SP, float actualValue){
 
   errors[2] = SP - actualValue;
@@ -44,7 +43,20 @@ float PID::PID_iteration(float SP, float actualValue){
 
   } 
 
+  //Saturation limits
+
+  if ( u > _saturation_upper) {
+
+    u = _saturation_upper;
+
+  } else if (u < _saturation_lower) {
+
+    u = _saturation_lower;
+
+  }
+
   errors[1] =  errors[2];
+
   errors[0] =  errors[1];
 
   return u ;
