@@ -14,7 +14,11 @@
 float PID::PID_iteration(float SP, float actualValue){
 
   errors[2] = SP - actualValue;
+
+  //Proportional error
   e_proportional =  errors[2];
+
+  //Integrative for trapzoidal rule and check if the system is in anti-windup
 
   if (_SW){
   e_integrative = (_h)*(errors[1] + errors[2])/2;
@@ -22,8 +26,10 @@ float PID::PID_iteration(float SP, float actualValue){
   e_integrative = 0;
   }
 
+  //Integrative accumulation
   e_integrative_acumulation += e_integrative;
 
+  //Derivative of 3 points backward
   e_derivative = (3*errors[2] - 4*errors[1] + errors[0])/(2*_h);
 
   //Action control 
@@ -43,6 +49,7 @@ float PID::PID_iteration(float SP, float actualValue){
     u = _saturation_lower;
   }
 
+  //Update errors
   errors[1] =  errors[2];
   errors[0] =  errors[1];
 

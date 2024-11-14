@@ -24,7 +24,7 @@ private:
     float errors[3] =  {0, 0, 0}; //inital condition of errors array 
                                    // index[0] = f_-2 , index[1] = f_-1 , index[2] = f_0
                                    // Where f is the function value at time (x)
-    float e_integrative_acumulation; 
+    float e_integrative_acumulation = 0; 
 
 };
 

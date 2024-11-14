@@ -21,3 +21,4 @@ float yawAngle;   // Actual Yaw (grades)
 
 int pitchServoPin = 20;
 int yawServoPin = 21;
+int motorServoPin = 19;
