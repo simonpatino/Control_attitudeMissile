@@ -41,6 +41,6 @@ void servoTransfer::configureESC() {
   delay(2000);  // Wait for 2 seconds
 
   // Return to neutral position
-  motorServoControl.moveMotor(90);  // Neutral throttle
-  delay(2000);  // Wait for 2 seconds
+  //motorServoControl.moveMotor(90);  // Neutral throttle
+  //delay(2000);  // Wait for 2 seconds
 }
