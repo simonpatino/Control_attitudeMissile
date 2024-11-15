@@ -33,14 +33,14 @@ void servoTransfer::configureESC() {
   delay(2000);  // Wait for 2 seconds
 
   // Set ESC to minimum position
-  motorServoControl.moveMotor(0);  // Minimum throttle
+  myServo.write(0);  // Minimum throttle
   delay(2000);  // Wait for 2 seconds
 
   // Set ESC to maximum position
-  motorServoControl.moveMotor(180);  // Maximum throttle
+  myServo.write(180);  // Maximum throttle
   delay(2000);  // Wait for 2 seconds
 
   // Return to neutral position
-  //motorServoControl.moveMotor(90);  // Neutral throttle
-  //delay(2000);  // Wait for 2 seconds
+  myServo.write(90);  // Neutral throttle
+  delay(2000);  // Wait for 2 seconds
 }
