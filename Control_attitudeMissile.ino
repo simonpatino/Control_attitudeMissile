@@ -20,7 +20,7 @@ void setup() {
   // Set initial setpoints for motor
 
   //WARNING ALERT: at this point the motor is moving to the setpoint, be careful with the motor 
-  motorServoControl.moveMotor(180);  // Move motor to 180 degrees (Max RPM)
+  motorServoControl.moveMotor(10);  // Move motor to 180 degrees (Max RPM)
 
   delay(5000);  // Time for configuration/stabilization
 
