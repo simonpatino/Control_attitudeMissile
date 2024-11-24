@@ -1,8 +1,7 @@
 #include "PID.h"
 #include <Arduino.h>
 
- PID::PID(float h, float Kp, float Ki, float Kd, float saturation_upper, float saturation_lower) {
-    _h = h; // Time  between measurments
+ PID::PID(float Kp, float Ki, float Kd, float saturation_upper, float saturation_lower) {
     _Kp = Kp;  // _Kp is the class member, Kp is the parameter
     _Ki = Ki;
     _Kd = Kd;
