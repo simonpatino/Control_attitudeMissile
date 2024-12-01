@@ -3,9 +3,9 @@
 
 float h = 0.1; //Delta time between measurements 
 
-float Kp = 5; // PID constant 
+float Kp = -3.0; // PID constant 
 float Ki = 0; // PID constant
-float Kd = 10; // PID constant
+float Kd = -2.5; // PID constant
 
 int saturation_upper = 82;  //Saturarion of the action signal
 int saturation_lower = -90; //Saturarion of the action signal

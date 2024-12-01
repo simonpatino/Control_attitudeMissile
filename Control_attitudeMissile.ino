@@ -23,7 +23,7 @@ void setup() {
   // Set initial setpoints for motor
 
   //WARNING ALERT: at this point the motor is moving to the setpoint, be careful with the motor 
-  motorServoControl.moveMotor(10);  // Move motor to 180 degrees (Max RPM)
+  motorServoControl.moveMotor(60);  // Move motor to 180 degrees (Max RPM)
 
   delay(5000);  // Time for configuration/stabilization
 
@@ -97,8 +97,8 @@ void loop() {
 
 
   // Move servos based on PID outputs
-  //pitchServoControl.move(u_pitch);  // Move pitch servo
-  //yawServoControl.move(u_yaw);      // Move yaw servo
+  pitchServoControl.move(u_pitch);  // Move pitch servo
+  yawServoControl.move(u_yaw);      // Move yaw servo
 
   //Serial.print(u_pitch);
   //Serial.println(F(""));
