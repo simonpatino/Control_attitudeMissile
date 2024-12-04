@@ -21,6 +21,8 @@ servoTransfer motorServoControl(motorServoPin, "motor");
 
 WiFiClient espClient;
 PubSubClient client(espClient);
+long lastMsg = 0;
+
 
 //MQTT SSID/Password 
 const char* ssid = " ";
@@ -179,19 +181,6 @@ void loop() {
     client.publish("esp32/IMU", imuData.c_str());
     Serial.print("IMU Data: ");
     Serial.println(imuData);
-
-    // Publish servo state data to MQTT topics
-    String servo1State = String("Servo 1 Angle: ") + servo1_angle;
-    String servo2State = String("Servo 2 Angle: ") + servo2_angle;
-
-    client.publish("esp32/servo1/state", String(servo1_angle).c_str());
-    client.publish("esp32/servo2/state", String(servo2_angle).c_str());
-
-    Serial.print("Servo 1 State: ");
-    Serial.println(servo1_angle);
-
-    Serial.print("Servo 2 State: ");
-    Serial.println(servo2_angle);
   }
 
   // #############################################################################3
