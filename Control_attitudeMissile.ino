@@ -25,9 +25,9 @@ long lastMsg = 0;
 
 
 //MQTT SSID/Password 
-const char* ssid = " ";
-const char* password = " ";
-const char* mqtt_server = " ";
+const char* ssid = "Redmi Note 13";
+const char* password = "ma221804*";
+const char* mqtt_server = "192.168.246.111";
 //
 
 void setup() {
@@ -113,20 +113,36 @@ void callback(char* topic, byte* message, unsigned int length) {
   if (String(topic) == "esp32/motor") {
     int motorCommand = messageTemp.toInt(); // Convert the message to an integer
     if (motorCommand == 0) {
-      motorServoControl.moveMotor(0); // Stop the motor
+      motorServoControl.moveMotor(0); // Stop the motor, 1 deletion
       Serial.println("Motor turned OFF.");
     } else if (motorCommand == 1) {
-      motorServoControl.moveMotor(180); // Start the motor (or adjust as needed)
+      motorServoControl.moveMotor(80); // Start the motor (or adjust as needed)
       Serial.println("Motor turned ON.");
     } else {
       Serial.println("Invalid motor command. Use 0 (OFF) or 1 (ON).");
     }
   }
+
+
+  if (String(topic) == "esp32/yawSP") {
+    int yawCommand = messageTemp.toInt(); // Convert the message to an integer
+    SP_yaw = yawCommand;
+  }
+
+
+  if (String(topic) == "esp32/pitchSP") {
+    int pitchCommand = messageTemp.toInt(); // Convert the message to an integer
+    SP_pitch = pitchCommand;
+  }
+
+  
 }
+
+
 
 // #########################################################################
 
-// #########################-MQTT - reconnect #####################################
+// #########################-MQTT - reconnect ##################, 1 deletion###################
 
 void reconnect() {
   while (!client.connected()) {
@@ -134,8 +150,8 @@ void reconnect() {
     if (client.connect("ESP32Client")) {
       Serial.println("connected");
       // Suscripciones a tópicos
-      client.subscribe("esp32/motor");
-      client.subscribe("esp32/IMU");
+      client.subscribe("esp32/yawActual");
+      client.subscribe("esp32/pitchActual");
 
       // No sé si esto sea necesario para públicar el estado de los servos también xd
       //client.subscribe("esp32/servo1/state"); // Nuevo tópico
@@ -145,7 +161,6 @@ void reconnect() {
       Serial.print("failed, rc=");
       Serial.print(client.state());
       Serial.println(" try again in 5 seconds");
-      delay(5000);
     }
   }
 }
@@ -166,22 +181,7 @@ void loop() {
   // Read current time
   long now = millis();
 
-  // Perform periodic tasks every 1 second
-  if (now - lastMsg > 1000) {
-    lastMsg = now;
-
-    // Read IMU sensor data
-    sensors_event_t event;
-    bno.getEvent(&event);
-
-    // Publish IMU orientation data to MQTT topic
-    String imuData = String("X: ") + event.orientation.x +
-                     " Y: " + event.orientation.y +
-                     " Z: " + event.orientation.z;
-    client.publish("esp32/IMU", imuData.c_str());
-    Serial.print("IMU Data: ");
-    Serial.println(imuData);
-  }
+  
 
   // #############################################################################3
 
@@ -191,6 +191,22 @@ void loop() {
 
   float pitchAngle = ((float)event.orientation.y);
   float yawAngle = ((float)event.orientation.z);
+
+
+// Perform periodic tasks every 1 second
+  if (now - lastMsg > 1000) {
+    lastMsg = now;
+
+    // Read IMU sensor data
+    
+    // Publish IMU orientation data to MQTT topic
+    String yawData = String(yawAngle);
+    String pitchData = String(pitchAngle);
+
+    client.publish("esp32/yawActual", yawData.c_str());
+    client.publish("esp32/pitchActual", pitchData.c_str());
+   
+  }
 
   //Debug 
   //Serial.print(F("Orientation: "));
