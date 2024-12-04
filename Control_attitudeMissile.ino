@@ -1,6 +1,12 @@
 #include "constant.h"
 #include "IMU.h"
 
+//MQTT libraries
+#include <WiFi.h>
+#include <PubSubClient.h>
+#include <Wire.h>
+//
+
 
 // PID controllers for pitch and yaw
 PID pitchController(Kp, Ki, Kd, saturation_upper, saturation_lower);
@@ -11,9 +17,28 @@ servoTransfer pitchServoControl(pitchServoPin);
 servoTransfer yawServoControl(yawServoPin);
 servoTransfer motorServoControl(motorServoPin, "motor");
 
+//MQTT
+
+WiFiClient espClient;
+PubSubClient client(espClient);
+
+//MQTT SSID/Password 
+const char* ssid = " ";
+const char* password = " ";
+const char* mqtt_server = " ";
+//
+
 void setup() {
 
   Serial.begin(115200);
+
+  // MQTT - setup
+
+  setup_wifi();
+  client.setServer(mqtt_server, 1883);
+  client.setCallback(callback);
+
+
   // Set initial position of servos to neutral (0 degrees)
   // Set initial position of motor to neutral (0 degrees)
   pitchServoControl.move(0);  
@@ -44,7 +69,132 @@ void setup() {
 
 }
 
+// #########################-MQTT - WIFI - SETUP#####################################
+
+void setup_wifi() {
+  delay(10);
+  Serial.println();
+  Serial.print("Connecting to ");
+  Serial.println(ssid);
+
+  WiFi.begin(ssid, password);
+
+  while (WiFi.status() != WL_CONNECTED) {
+    delay(500);
+    Serial.print(".");
+  }
+
+  Serial.println("");
+  Serial.println("WiFi connected");
+  Serial.println("IP address: ");
+  Serial.println(WiFi.localIP());
+}
+
+// #########################################################################
+
+// #########################-MQTT - Callback - to recibe something#####################################
+
+void callback(char* topic, byte* message, unsigned int length) {
+  Serial.print("Message arrived on topic: ");
+  Serial.print(topic);
+  Serial.print(". Message: ");
+  String messageTemp;
+
+  // Combine incoming message bytes into a string
+  for (int i = 0; i < length; i++) {
+    Serial.print((char)message[i]);
+    messageTemp += (char)message[i];
+  }
+  Serial.println();
+
+  // Check if the message is for the motor control topic
+  if (String(topic) == "esp32/motor") {
+    int motorCommand = messageTemp.toInt(); // Convert the message to an integer
+    if (motorCommand == 0) {
+      motorServoControl.moveMotor(0); // Stop the motor
+      Serial.println("Motor turned OFF.");
+    } else if (motorCommand == 1) {
+      motorServoControl.moveMotor(180); // Start the motor (or adjust as needed)
+      Serial.println("Motor turned ON.");
+    } else {
+      Serial.println("Invalid motor command. Use 0 (OFF) or 1 (ON).");
+    }
+  }
+}
+
+// #########################################################################
+
+// #########################-MQTT - reconnect #####################################
+
+void reconnect() {
+  while (!client.connected()) {
+    Serial.print("Attempting MQTT connection...");
+    if (client.connect("ESP32Client")) {
+      Serial.println("connected");
+      // Suscripciones a tópicos
+      client.subscribe("esp32/motor");
+      client.subscribe("esp32/IMU");
+
+      // No sé si esto sea necesario para públicar el estado de los servos también xd
+      //client.subscribe("esp32/servo1/state"); // Nuevo tópico
+      //client.subscribe("esp32/servo2/state"); // Nuevo tópico 
+
+    } else {
+      Serial.print("failed, rc=");
+      Serial.print(client.state());
+      Serial.println(" try again in 5 seconds");
+      delay(5000);
+    }
+  }
+}
+
+// #########################################################################
+
+
+
+
 void loop() {
+
+   // Ensure MQTT connection
+  if (!client.connected()) {
+    reconnect();
+  }
+  client.loop();
+
+  // Read current time
+  long now = millis();
+
+  // Perform periodic tasks every 1 second
+  if (now - lastMsg > 1000) {
+    lastMsg = now;
+
+    // Read IMU sensor data
+    sensors_event_t event;
+    bno.getEvent(&event);
+
+    // Publish IMU orientation data to MQTT topic
+    String imuData = String("X: ") + event.orientation.x +
+                     " Y: " + event.orientation.y +
+                     " Z: " + event.orientation.z;
+    client.publish("esp32/IMU", imuData.c_str());
+    Serial.print("IMU Data: ");
+    Serial.println(imuData);
+
+    // Publish servo state data to MQTT topics
+    String servo1State = String("Servo 1 Angle: ") + servo1_angle;
+    String servo2State = String("Servo 2 Angle: ") + servo2_angle;
+
+    client.publish("esp32/servo1/state", String(servo1_angle).c_str());
+    client.publish("esp32/servo2/state", String(servo2_angle).c_str());
+
+    Serial.print("Servo 1 State: ");
+    Serial.println(servo1_angle);
+
+    Serial.print("Servo 2 State: ");
+    Serial.println(servo2_angle);
+  }
+
+  // #############################################################################3
 
   // Read the current pitch and yaw angles (replace with actual sensor reading logic)
   sensors_event_t event;
@@ -113,5 +263,4 @@ void loop() {
 
   //Serial.println(pitchController.e_proportional);
   //Serial.println(pitchController.e_derivative);
-
 }
